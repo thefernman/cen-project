@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import account.models.MakeReplay;
+//import account.models.MakeReplay;
+import account.models.Facade;
 
 /**
  * Servlet implementation class CommentServlet
@@ -39,21 +40,21 @@ public class CommentServlet extends HttpServlet {
 			String text = request.getParameter("text");
 
 
-			MakeReplay.postReplay(parent, text, session
-					.getAttribute("username").toString());
+			Facade.postReplay(parent, text, session
+					.getAttribute("username").toString()); // changed FCC
 		}else if(request.getParameter("type").equalsIgnoreCase("comment")){
 			String text = request.getParameter("text");			
 
-			int result = MakeReplay.postComment(text, session
-					.getAttribute("username").toString());
+			int result = Facade.postComment(text, session
+					.getAttribute("username").toString()); // changed FCC
 
 			response.getWriter().write(String.valueOf(result));
 			
 		}else if(request.getParameter("type").equalsIgnoreCase("getnewcomment")){
 			int total_comments = Integer.parseInt(request.getParameter("total_comments"));
 			
-			String json = MakeReplay.getLast(total_comments);
-			response.getWriter().write(json);
+			String json = Facade.getLast(total_comments);
+			response.getWriter().write(json); // changed FCC
 		}
 		
 	}
