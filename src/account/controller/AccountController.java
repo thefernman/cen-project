@@ -114,7 +114,7 @@ public class AccountController extends HttpServlet
                 request.setAttribute( "total_comments", total_comments );
 
                 // Redirect to landing page
-                if ( row[3].equals( "S" ) )
+                if ( row[3].equalsIgnoreCase( "S" ) )
                 {
                     ArrayList<User> nonAdmin = Facade.findNoAdmin(); // changed FCC
                     ArrayList<User> requests = Facade
@@ -218,7 +218,7 @@ public class AccountController extends HttpServlet
                 request.setAttribute( "total_comments", total_comments );
 
                 // Redirect to landing page
-                if ( session.getAttribute( "privileges" ).toString().equals( "s" ) )
+                if ( session.getAttribute( "privileges" ).toString().equalsIgnoreCase( "s" ) )
                 {
                     ArrayList<User> nonAdmin = Facade.findNoAdmin(); // changed FCC
                     ArrayList<User> requests = Facade
@@ -250,7 +250,7 @@ public class AccountController extends HttpServlet
                 request.setAttribute( "total_comments", total_comments );
 
                 // Redirect to landing page
-                if ( session.getAttribute( "privileges" ).toString().equals( "s" ) )
+                if ( session.getAttribute( "privileges" ).toString().equalsIgnoreCase( "s" ) )
                 {
                     ArrayList<User> nonAdmin = Facade.findNoAdmin(); // changed
                     ArrayList<User> requests = Facade.showAdminRequest(); // changed FCC
@@ -299,7 +299,7 @@ public class AccountController extends HttpServlet
                 option = request.getParameter( "decision" + i );
                 username = request.getParameter( "username" + i );
 
-                if ( option.equals( "approve" ) )
+                if ( option.equalsIgnoreCase( "approve" ) )
                 {
                     newUser.setUserName( username );
                     approved.add( newUser );
@@ -324,7 +324,7 @@ public class AccountController extends HttpServlet
             request.setAttribute( "total_comments", total_comments );
 
             // Redirect to landing page
-            if ( session.getAttribute( "privileges" ).toString().equals( "s" ) )
+            if ( session.getAttribute( "privileges" ).toString().equalsIgnoreCase( "s" ) )
             {
                 ArrayList<User> nonAdmin = Facade.findNoAdmin(); // changed FCC
                 ArrayList<User> requests = Facade.showAdminRequest(); // changed FCC
