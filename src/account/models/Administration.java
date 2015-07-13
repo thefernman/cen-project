@@ -1,52 +1,26 @@
 package account.models;
 
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
-//import org.apache.catalina.ant.FindLeaksTask;
-
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
-
 public class Administration {
-
-	static String connectionURL = "jdbc:mysql://softeng.cs.fiu.edu:3306/family_tree__accounts_only";
-	static Connection connection = null;
-	static Statement statement = null;
-	static ResultSet rs = null;
-	static String dbUsername = "ft_accounts"; // Database username
-	static String dbPassword = "2K7hWXvfay9cB2qW"; // Database password
 
 	public static ArrayList<User> findNoAdmin() {
 
 		ArrayList<User> nonAdmin = new ArrayList<User>();
+		ResultSet rs = null;
 
-		// String connectionURL =
-		// "jdbc:mysql://softeng.cs.fiu.edu:3306/family_tree__accounts_only";
-		// Connection connection = null;
-		// //Statement statement = null;
-		// ResultSet rs = null;
-		// String dbUsername = "ft_accounts"; // Database username
-		// String dbPassword = "2K7hWXvfay9cB2qW"; // Database password
-
+		DBConnection dbconnection = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			dbconnection = new DBConnection();
+			System.out.println(" Connection Established from Administration findNoAdmin. ");
 		} catch (Exception e) {
-			System.out.println(" Unable to load driver. ");
+			e.printStackTrace();
+			System.out.println(" Error connecting to database from Administration findNoAdmin:  " + e);
 		}
-		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
-			System.out.println(" Connection Established. ");
 
-			// After this, create your own logic
-			PreparedStatement st = (PreparedStatement) connection
-					.prepareStatement("SELECT username, fname, lname, privileges FROM Users WHERE privileges = ?");
-			st.setString(1, "u");
-			rs = st.executeQuery();
+		try {
+			rs = dbconnection.executeQuery("SELECT username, fname, lname, privileges FROM Users WHERE privileges = 'U'");
 
 			if (rs != null) {
 				String user = "";
@@ -63,12 +37,10 @@ public class Administration {
 					User user1 = new User(user, fname, lname, privileges);
 
 					nonAdmin.add(user1);
-					// System.out.println(user);
 				}
-				connection.close();
 			}
 		} catch (Exception e) {
-			System.out.println(" Error connecting to database:  " + e);
+			System.out.println(" Error executing query to database from Administration findNoAdmin:  " + e);
 		}
 
 		return nonAdmin;
@@ -82,8 +54,8 @@ public class Administration {
 	 */
 	public static boolean makeAdmin(ArrayList<User> newAdmins) {
 
-		int totalUsersToChange = newAdmins.size(); // record number of users to
-													// be changed
+		// record number of users to be changed
+		int totalUsersToChange = newAdmins.size();
 
 		if (totalUsersToChange == 0) {
 			// Empty list of users passed
@@ -91,9 +63,9 @@ public class Administration {
 			return false;
 		}
 
+		DBConnection dbconnection;
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
+			dbconnection = new DBConnection();
 			System.out.println(" Connection Established. ");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -101,29 +73,21 @@ public class Administration {
 		}
 
 		int noChange = 0; // Count the amount of users no changed
-		for(int i = 0; i < newAdmins.size(); i++) {
+		for (int i = 0; i < newAdmins.size(); i++) {
 
-			String username = newAdmins.get(i).getUserName(); // saves the
-																	// username
+			String username = newAdmins.get(i).getUserName(); // saves the username
 
 			try {
 				String query = "UPDATE Users SET privileges = 'a' WHERE username = '"
 						+ username + "'";
-				statement = (PreparedStatement) connection
-						.prepareStatement(query);
-				statement.executeUpdate(query);
+
+				dbconnection.executeUpdate(query);
 
 			} catch (Exception e) {
 				e.printStackTrace();
 				noChange++;
 			}
 
-		}
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		if (totalUsersToChange == noChange) {
@@ -137,34 +101,30 @@ public class Administration {
 	public static String sendRequest(String username, String fname, String lname) {
 
 		// Connect to database
+		DBConnection dbconnection;
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
+			dbconnection = new DBConnection();
 			System.out.println(" Connection Established. ");
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "Error Conecting to Database";
+			return "Error Conecting to Database from Administration sendRequest.";
 		}
 
-		PreparedStatement st;
+		String query = "";
+		ResultSet rs = null;
 		try {
-			st = (PreparedStatement) connection
-					.prepareStatement("SELECT * FROM AdminRequest WHERE requested_by = ?");
-			st.setString(1, username);
-			rs = st.executeQuery();
+			query = "SELECT * FROM AdminRequest WHERE requested_by = '"
+					+ username + "'";
+
+			rs = dbconnection.executeQuery(query);
 
 			if (!rs.next()) {
 				try {
-					String query = "INSERT INTO AdminRequest (requested_by, fname, lname) VALUES (?, ?, ?)";
+					query = "INSERT INTO AdminRequest (requested_by, fname, lname) VALUES ('"
+							+ username + "', '" + fname + "', '" + lname + "')";
 
-					st = (PreparedStatement) connection.prepareStatement(query);
-					st.setString(1, username);
-					st.setString(2, fname);
-					st.setString(3, lname);
+					dbconnection.executeUpdate(query);
 
-					st.executeUpdate();
-					connection.close();
-					
 					return "Your request has been sent!";
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -176,28 +136,26 @@ public class Administration {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "Error Connecting to Database";
+			return "Error executing to Database from Administration sendRequest.";
 		}
 	}
 
 	public static ArrayList<User> showAdminRequest() {
 
 		ArrayList<User> list = new ArrayList<User>();
-
+		DBConnection dbconnection = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			dbconnection = new DBConnection();
+			System.out.println(" Connection Established. LogInandLogOut doLogin ");
 		} catch (Exception e) {
-			System.out.println(" Unable to load driver. ");
+			e.printStackTrace();
+			System.out.println(" Error connecting to database from Administration showAdminRequest:  " + e);
 		}
-		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
-			System.out.println(" Connection Established. ");
 
+		ResultSet rs = null;
+		try {
 			// After this, create your own logic
-			PreparedStatement st = (PreparedStatement) connection
-					.prepareStatement("SELECT * FROM AdminRequest");
-			rs = st.executeQuery();
+			rs = dbconnection.executeQuery("SELECT * FROM AdminRequest");
 
 			String username = "";
 			String fname = "";
@@ -217,9 +175,8 @@ public class Administration {
 				list.add(u);
 			}
 
-			connection.close();
 		} catch (Exception e) {
-			System.out.println(" Error connecting to database:  " + e);
+			System.out.println(" Error executing query to database from Administration showAdminRequest:  " + e);
 		}
 
 		return list;
@@ -227,12 +184,13 @@ public class Administration {
 
 	public static void dropFromTable(ArrayList<User> list) {
 
+		DBConnection dbconnection = null;
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
+			dbconnection = new DBConnection();
 			System.out.println(" Connection Established. ");
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println(" Error connecting to database from Administration dropFromTable:  " + e);
 		}
 
 		while (!list.isEmpty()) {
@@ -242,45 +200,12 @@ public class Administration {
 			try {
 				String query = "DELETE FROM AdminRequest WHERE requested_by = '"
 						+ username + "'";
-				statement = (PreparedStatement) connection
-						.prepareStatement(query);
-				statement.executeUpdate(query);
+				dbconnection.executeUpdate(query);
 
 			} catch (Exception e) {
 				e.printStackTrace();
+				System.out.println(" Error deleting from database from Administration dropFromTable:  " + e);
 			}
 		}
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
-
-	public static void main(String[] args) {
-		//
-		// //ArrayList<User> test = new ArrayList<User>();
-		ArrayList<User> test = Administration.showAdminRequest();
-		// //FindNonAdmin test2 = new FindNonAdmin();
-		//
-		// //test = test2.findNoAdmin();
-		//
-		dropFromTable(test);
-		// while (!test.isEmpty()) { System.out.println(test.remove(0).fname); }
-		//
-	}
-
-	// public static void main(String[] args) {
-	//
-	// ArrayList<User> test = Administration.findNoAdmin();
-	// Administration.makeAdmin(test);
-	// test = Administration.findNoAdmin();
-	//
-	// while (!test.isEmpty()) {
-	// System.out.println(test.remove(0).userName);
-	// }
-	// }
-
 }

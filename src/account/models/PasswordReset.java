@@ -1,39 +1,25 @@
 package account.models;
 
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
 
 public class PasswordReset {
 
 	public boolean checkEmail(String username) {
 
 		// To connect to the database
-		String connectionURL = "jdbc:mysql://softeng.cs.fiu.edu:3306/family_tree__accounts_only";
-		Connection connection = null;
-		Statement statement = null;
-		ResultSet rs = null;
-		String dbUsername = "ft_accounts"; // Database username
-		String dbPassword = "2K7hWXvfay9cB2qW"; // Database password
-
+		DBConnection dbconnection = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			dbconnection = new DBConnection();
+			System.out.println(" Connection Established from PasswordReset checkEmail. ");
 		} catch (Exception e) {
-			System.out.println(" Unable to load driver. ");
+			e.printStackTrace();
+			System.out.println(" Error connecting to database from PasswordReset checkEmail:  " + e);
 		}
+		ResultSet rs = null;
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
-			System.out.println(" Connection Established. ");
-
 			// After this, create your own logic
-			PreparedStatement st = (PreparedStatement) connection
-					.prepareStatement("SELECT username, fname, password FROM Users WHERE username = ?");
-			st.setString(1, username);
-			rs = st.executeQuery();
+			String query = "SELECT username, fname, password FROM Users WHERE username = '" + username + "'";
+			rs = dbconnection.executeQuery(query);
 
 			if (rs != null) {
 				String email = "";
@@ -45,23 +31,20 @@ public class PasswordReset {
 					name = rs.getString("fname");
 					pass = rs.getString("password");
 				}
-
-				connection.close();
+				
 				if (username.compareTo(email) == 0) {
 
 					//send(username, name, pass);
-					SendEmail.send(username, name, "Forgot Password",  "You have requested your password for your Family Tree Account. " +
+					SendEmail.send(username, name, "Forgot Password",  "You have requested your password "
+							+ "for your Family Tree Account. " +
 							"The password for your account is " + pass);
 
 					return true;
 				}
 			}
 		} catch (Exception e) {
-			System.out.println(" Error connecting to database:  " + e);
+			System.out.println(" Error executing query to database from PasswordReset checkEmail:  " + e);
 		}
 		return false;
-
-		// username: accountsystem passoword: accounts
 	}
-	
 }

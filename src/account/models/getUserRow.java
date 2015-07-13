@@ -1,11 +1,6 @@
 package account.models;
 
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
 
 public class getUserRow {
 	
@@ -14,27 +9,20 @@ public class getUserRow {
 		String [] row = new String[4];
 
 		//To connect to the database
-		String connectionURL = "jdbc:mysql://softeng.cs.fiu.edu:3306/family_tree__accounts_only";
-		Connection connection = null;
-		//Statement statement = null;
-		ResultSet rs = null;
-		String dbUsername = "ft_accounts"; // Database username
-		String dbPassword = "2K7hWXvfay9cB2qW"; // Database password
-
+		DBConnection dbconnection = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			dbconnection = new DBConnection();
+			System.out.println(" Connection Established from getUserInfo getUserInfo. ");
 		} catch (Exception e) {
-			System.out.println(" Unable to load driver. ");
+			e.printStackTrace();
+			System.out.println(" Error connecting to database from getUserInfo getUserInfo:  " + e);
 		}
+
+		ResultSet rs = null;
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
-			//System.out.println(" Connection Established. ");
-			
 			//After this, create your own logic
-			PreparedStatement st = (PreparedStatement) connection.prepareStatement("SELECT * FROM Users WHERE username = ?");
-			st.setString(1, username);
-			rs = st.executeQuery();
+			String query = "SELECT * FROM Users WHERE username = '" + username + "'";
+			rs = dbconnection.executeQuery(query);
 
 			if (rs != null) {			
 				
@@ -45,14 +33,11 @@ public class getUserRow {
 					 row[3] = rs.getString("privileges");
 				}
 			}
-			connection.close();
 		} catch (Exception e) {
-			System.out.println(" Error connecting to database:  " + e);
+			System.out.println(" Error executing query to database from getUserInfo getUserInfo:  " + e);
 		}
 		
 		return row;
-
-		// username: accountsystem passoword: accounts
 	}
 
 }

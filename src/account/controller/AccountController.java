@@ -114,7 +114,7 @@ public class AccountController extends HttpServlet
                 request.setAttribute( "total_comments", total_comments );
 
                 // Redirect to landing page
-                if ( row[3].equals( "s" ) )
+                if ( row[3].equals( "S" ) )
                 {
                     ArrayList<User> nonAdmin = Facade.findNoAdmin(); // changed FCC
                     ArrayList<User> requests = Facade

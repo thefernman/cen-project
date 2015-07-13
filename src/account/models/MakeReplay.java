@@ -1,45 +1,26 @@
 package account.models;
 
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-
-import javax.servlet.http.HttpSession;
-
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
 
 public class MakeReplay {
 
 	public static void postReplay(int id, String text, String owner) {
 
 		// To connect to the database
-		String connectionURL = "jdbc:mysql://softeng.cs.fiu.edu:3306/family_tree__accounts_only";
-		Connection connection = null;
-		ResultSet rs = null;
-		String dbUsername = "ft_accounts"; // Database username
-		String dbPassword = "2K7hWXvfay9cB2qW"; // Database password
-
+		DBConnection dbconnection = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			dbconnection = new DBConnection();
+			System.out.println(" Connection Established from MakeReplay postReplay. ");
 		} catch (Exception e) {
-			System.out.println(" Unable to load driver. ");
+			e.printStackTrace();
+			System.out.println(" Error connecting to database from MakeReplay postReplay:  " + e);
 		}
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
-			//System.out.println(" Connection Established. ");
-
 			// After this, create your own logic
-			PreparedStatement st = (PreparedStatement) connection
-					.prepareStatement("CALL insert_replay(?,?,?)");
-			st.setString(1, text);
-			st.setInt(2, id);
-			st.setString(3, owner);
-			st.executeQuery();
-			
-			connection.close();
+			String query = "CALL insert_replay('"+ text + "','"+ id + "','"+ owner + "')";
+			dbconnection.executeQuery(query);
 		} catch (Exception e) {
-			System.out.println(" Error connecting to database:  " + e);
+			System.out.println(" Error calling insert_replay to database from MakeReplay postReplay:  " + e);
 		}
 	}
 	
@@ -47,35 +28,26 @@ public class MakeReplay {
 		
 		int id = -1;
 		// To connect to the database
-		String connectionURL = "jdbc:mysql://softeng.cs.fiu.edu:3306/family_tree__accounts_only";
-		Connection connection = null;
-		ResultSet rs = null;
-		String dbUsername = "ft_accounts"; // Database username
-		String dbPassword = "2K7hWXvfay9cB2qW"; // Database password
-
+		DBConnection dbconnection = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			dbconnection = new DBConnection();
+			System.out.println(" Connection Established from MakeReplay postComment. ");
 		} catch (Exception e) {
-			System.out.println(" Unable to load driver. ");
+			e.printStackTrace();
+			System.out.println(" Error connecting to database from MakeReplay postComment:  " + e);
 		}
+		ResultSet rs = null;
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
-			//System.out.println(" Connection Established. ");
-
 			// After this, create your own logic
-			PreparedStatement st = (PreparedStatement) connection
-					.prepareStatement("CALL insert_comment(?,?)");
-			st.setString(1, text);
-			st.setString(2, owner);
-			rs = st.executeQuery();
+			String query = "CALL insert_comment('" + text + "','" + owner + "')";
+			System.out.println("Called insert_comment from from MakeReplay postComment");
+			rs = dbconnection.executeQuery(query);
 			
 			if (rs != null) 
 				while (rs.next()) 
 					id = rs.getInt("comment_id");
-			connection.close();
 		} catch (Exception e) {
-			System.out.println(" Error connecting to database:  " + e);
+			System.out.println(" Error executing insert_comment to database from MakeReplay postComment:  " + e);
 		}
 	return id;
 	}
@@ -85,25 +57,20 @@ public class MakeReplay {
 		int result = 0;
 		String json = "";
 		// To connect to the database
-		String connectionURL = "jdbc:mysql://softeng.cs.fiu.edu:3306/family_tree__accounts_only";
-		Connection connection = null;
-		ResultSet rs = null;
-		String dbUsername = "ft_accounts"; // Database username
-		String dbPassword = "2K7hWXvfay9cB2qW"; // Database password
-
+		DBConnection dbconnection = null;
+		String query = "";
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			dbconnection = new DBConnection();
+			System.out.println(" Connection Established from MakeReplay getLast. ");
 		} catch (Exception e) {
-			System.out.println(" Unable to load driver. ");
+			e.printStackTrace();
+			System.out.println(" Error connecting to database from MakeReplay getLast:  " + e);
 		}
+		ResultSet rs = null;
 		try {
-			connection = (Connection) DriverManager.getConnection(
-					connectionURL, dbUsername, dbPassword);
-			//System.out.println(" Connection Established. ");
-
 			// After this, create your own logic
-			PreparedStatement st = (PreparedStatement) connection.prepareStatement("SELECT Count(*) as total FROM Comments");		
-			rs = st.executeQuery();
+			query = "SELECT Count(*) as total FROM Comments";
+			rs = dbconnection.executeQuery(query);
 			if (rs != null){
 				while (rs.next()){
 					result = rs.getInt("total");
@@ -112,9 +79,10 @@ public class MakeReplay {
 			
 			if(result > total){
 				result = result - total;
-				st = (PreparedStatement) connection.prepareStatement("SELECT comment_id,comment_family,content,fname,lname FROM Comments,Users where created_by = username Order by comment_id Desc Limit ?");
-				st.setInt(1, result);
-				rs = st.executeQuery();
+				query = "SELECT comment_id,comment_family,content,fname,lname "
+						+ "FROM Comments,Users where created_by = username Order "
+						+ "by comment_id Desc Limit " + result;
+				rs = dbconnection.executeQuery(query);
 				if (rs != null){ 
 					json = "[";
 					while (rs.next()){
@@ -131,7 +99,7 @@ public class MakeReplay {
 				}
 			}			
 		} catch (Exception e) {
-			System.out.println("Error connecting to database: " + e);
+			System.out.println("Error connecting to database from MakeReplay getLast: " + e);
 		}
 		return json;
 	}

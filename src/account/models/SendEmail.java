@@ -26,8 +26,8 @@ public class SendEmail {
 			 * encrypt password. Scroll down to comments below to see how to use
 			 * java.util.Properties in JSF context.
 			 */
-			String senderEmail = "famtreeservices@gmail.com";
-			String senderMailPassword = "1234test";
+			String senderEmail = "familytreetesting@gmail.com";
+			String senderMailPassword = "clarke123";
 			String gmail = "smtp.gmail.com";
 
 			Properties props = System.getProperties();
