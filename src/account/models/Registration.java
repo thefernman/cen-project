@@ -20,7 +20,7 @@ public class Registration {
 		ResultSet rs = null;
 		try {
 			// After this, create your own logic
-			String query = "SELECT * FROM Users WHERE username = " + email;
+			String query = "SELECT * FROM Users WHERE username = '" + email + "'";
 			rs = dbconnection.executeQuery(query);
 		
 			//return false if email already taken
