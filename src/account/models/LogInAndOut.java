@@ -1,6 +1,7 @@
 package account.models;
 
-import java.sql.ResultSet;
+//import java.sql.ResultSet;
+import account.models.ResultSet;
 
 public class LogInAndOut {
 
