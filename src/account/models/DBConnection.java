@@ -7,7 +7,6 @@ public class DBConnection {
 	
 	private static DBConnection instance;
 	static ResultSet db;
-	Boolean testBool;
 	String username;
 	String password;
 	
@@ -17,6 +16,10 @@ public class DBConnection {
 
 	public void addUser(User user) {
 		db.addUser(user);
+	}
+	
+	public void addComment(Comments c) {
+		db.addComments(c);
 	}
 
 	public static DBConnection getInstance(ResultSet rs) {

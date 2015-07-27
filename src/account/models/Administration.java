@@ -147,7 +147,7 @@ public class Administration {
 		DBConnection dbconnection = null;
 		try {
 			dbconnection = new DBConnection();
-			System.out.println(" Connection Established. LogInandLogOut doLogin ");
+			System.out.println(" Connection Established. Administration showAdminRequest ");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(" Error connecting to database from Administration showAdminRequest:  " + e);
@@ -179,7 +179,7 @@ public class Administration {
 		} catch (Exception e) {
 			System.out.println(" Error executing query to database from Administration showAdminRequest:  " + e);
 		}
-
+		System.out.println("I came into this method");
 		return list;
 	}
 
