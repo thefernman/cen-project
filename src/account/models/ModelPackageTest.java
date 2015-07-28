@@ -497,7 +497,7 @@ public class ModelPackageTest {
 	/*
 	 * More test cases
 	 */
-	//showadminrequest does not set Priviledges
+	//shoeAdminRequest does not set Priviledges
 	@Test
 	public void AS001SARSubSystemTC001() {
 		DBConnection.getInstance(new ResultSet("user"));
@@ -518,7 +518,6 @@ public class ModelPackageTest {
 	@Test
 	public void AS001MISubSystemTC004() {
 		DBConnection.getInstance(new ResultSet("user"));
-//		dbstub.addUser(new User("jpere610@fiu.edu", "Jeff", "Perez", "U"));
 		int id = Facade.getMemberID("", "", "");
 		assertEquals("Member ID", true, id == -1);
 	}
